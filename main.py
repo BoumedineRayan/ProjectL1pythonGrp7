@@ -1,5 +1,7 @@
 
 import os
+import string
+import math
 
 
 def extract(file):  # Definition of the extract function
@@ -73,21 +75,120 @@ def FCleaner():
     ]
 
     # Create the "cleaned" directory
-    cleaned_dir = " Cleaned" # Set the name of the directory as "Cleaned"
+    cleaned_dir = "Cleaned"  # Set the name of the directory as "Cleaned"
     if not os.path.exists(cleaned_dir):
-        os.mkdir(cleaned_dir) # Create the directory
-
+        os.mkdir(cleaned_dir)  # Create the directory
 
     # Iterate on the dictionary
     for filename in filenames:
-        inputpath = os.path.join("speeches", filename) # Construct a path to the original file in the "speeches" directory
-        outputpath = os.path.join(cleaned_dir, filename) # constructs the o,
+        inputpath = os.path.join("speeches", filename)  # Construct a path to the original file in the "speeches" directory
+        outputpath = os.path.join(cleaned_dir, filename)  # constructs the o,
         # which is the path where the cleaned file will be saved
 
         with open(inputpath, "r") as inputfile:
-            contentofthefile = inputfile.read().lower() # convert to lower case
-        with open(outputpath, "w") as outputfile:
-            outputfile.write(contentofthefile)     # write the converted text into a new document
-            # in the Cleaned directory
+            contentofthefile = inputfile.read().lower()  # convert to lower case and store in a variable
 
+
+        with open(outputpath, "w") as outputfile:
+            outputfile.write(contentofthefile)  # write the converted text into a new document
+            # in the Cleaned directory
 FCleaner()
+
+
+
+def remove_punctuation(directory):
+    for filename in os.listdir(directory):
+        filepath = os.path.join(directory, filename)
+        with open(filepath, 'r') as f:
+            text = f.read()
+
+        # replace apostrophe with space
+        text = text.replace("'", " ")
+
+        # replace dash with space
+        text = text.replace("-", " ")
+
+        # remove newline characters
+        text = text.replace("\n", " ")
+
+        # remove punctuation characters
+        text = text.translate(str.maketrans('', '', string.punctuation))
+
+        with open(filepath, 'w') as f:
+            f.write(text)
+
+
+remove_punctuation("Cleaned")
+
+
+def word_count(s):
+    # Split the string into words
+    words = s.split()
+
+    # Initialize an empty dictionary
+    word_dict = {}
+
+    # Iterate over each word in the list
+    for word in words:
+        # If the word is already in the dictionary, increment its count
+        if word in word_dict:
+            word_dict[word] += 1
+        # Otherwise, add the word to the dictionary with a count of 1
+        else:
+            word_dict[word] = 1
+
+    # Return the completed dictionary
+    return word_dict
+
+
+
+def idf():
+    # Get a list of all files in the directory
+    files = os.listdir("Cleaned")
+
+    # Initialize an empty dictionary to store the IDF scores
+    idf_scores = {}
+
+    # Calculate the total number of documents in the corpus
+    num_docs = len(files)
+
+    # Initialize a dictionary to store the number of documents that contain each word
+    doc_counts = {}
+
+    # Iterate over each file in the directory
+    for filename in files:
+        filepath = os.path.join("Cleaned", filename)
+        with open(filepath, 'r') as f:
+            text = f.read()
+
+            # Split the text into words
+            words = text.split()
+
+            # Iterate over each word in the text
+            for word in words:
+                # Convert the word to lowercase to handle case sensitivity
+                word = word.lower()
+
+                # Check if the word is already in the doc_counts dictionary
+                if word in doc_counts:
+                    # If the word is already in the doc_counts dictionary, increment its count
+                    doc_counts[word] += 1
+                else:
+                    # If the word is not in the doc_counts dictionary, add it with a count of 1
+                    doc_counts[word] = 1
+
+    # Calculate the IDF score for each word
+    for word, count in doc_counts.items():
+        idf_scores[word] = math.log(num_docs / count)
+
+    return idf_scores
+
+fileâth = os.path.join("Cleaned",filename)
+
+
+
+
+
+
+
+
