@@ -2,6 +2,7 @@
 import os
 import string
 import math
+from collections import defaultdict
 
 
 def extract(file):  # Definition of the extract function
@@ -121,7 +122,7 @@ def remove_punctuation(directory):
 remove_punctuation("Cleaned")
 
 
-def word_count(s):
+def Tf(s):
     # Split the string into words
     words = s.split()
 
@@ -142,48 +143,56 @@ def word_count(s):
 
 
 
-def idf():
-    # Get a list of all files in the directory
-    files = os.listdir("Cleaned")
 
-    # Initialize an empty dictionary to store the IDF scores
-    idf_scores = {}
+def idf_score(directory):
+    files = os.listdir(directory)  # List all the files in the directory
+    num_docs = len(files)  # Count the total number of documents (files)
 
-    # Calculate the total number of documents in the corpus
-    num_docs = len(files)
+    doc_counts = defaultdict(int)  # Create a dictionary to store the number of documents containing each word
+    idf_scores = defaultdict(float)  # Create a dictionary to store the IDF scores for each word
 
-    # Initialize a dictionary to store the number of documents that contain each word
-    doc_counts = {}
+    for file in files:
+        with open(os.path.join(directory, file), 'r') as f:
+            content = f.read()  # Read the content of the file
+            words = content.split()  # Split the content into individual words
 
-    # Iterate over each file in the directory
-    for filename in files:
-        filepath = os.path.join("Cleaned", filename)
-        with open(filepath, 'r') as f:
-            text = f.read()
+        unique_words = set(words)  # Use a set to count each word only once per document
+        for word in unique_words:
+            doc_counts[word] += 1  # Increment the count for the current word in the doc_counts dictionary
 
-            # Split the text into words
-            words = text.split()
-
-            # Iterate over each word in the text
-            for word in words:
-                # Convert the word to lowercase to handle case sensitivity
-                word = word.lower()
-
-                # Check if the word is already in the doc_counts dictionary
-                if word in doc_counts:
-                    # If the word is already in the doc_counts dictionary, increment its count
-                    doc_counts[word] += 1
-                else:
-                    # If the word is not in the doc_counts dictionary, add it with a count of 1
-                    doc_counts[word] = 1
-
-    # Calculate the IDF score for each word
     for word, count in doc_counts.items():
-        idf_scores[word] = math.log(num_docs / count)
+        if count != 0:
+            idf_scores[word] = math.log10(num_docs / count)  # Calculate the IDF score for the current word and store it in the idf_scores dictionary
+        else:
+            idf_scores[word] = float('inf')  # Handle the case where count is zero (word appears in all documents)
 
-    return idf_scores
+    return idf_scores  # Return the IDF scores for all the words in the directory
 
-fileâth = os.path.join("Cleaned",filename)
+
+
+
+def tfidf(directory_path):
+    # Get the list of file paths in the specified directory
+    file_paths = [os.path.join(directory_path, file) for file in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, file))]
+
+    # Read the content of each file
+    documents = []
+    for file_path in file_paths:
+        with open(file_path, 'r') as file:
+            content = file.read()
+            documents.append(content)
+
+    # Use Tf and idf_score functions to calculate TF-IDF matrix
+    tfidf_values = []
+    idf_scores = idf_score(directory_path)
+    for document in documents:
+        tf_values = Tf(document)
+        tfidf_values.append({word: tf * idf_scores[word] for word, tf in tf_values.items()})
+
+    # Convert the TF-IDF matrix to a list of dictionaries for better readability
+    return tfidf_values
+
+print(tfidf("Cleaned"))
 
 
 
