@@ -293,8 +293,3 @@ def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
     for word in unimportant_words:
         all_presidents_words.discard(word)
     return list(all_presidents_words)
-
-print(words_mentioned_by_all_presidents(tfidf("Cleaned"), least_important_words(tfidf("Cleaned"))))
-
-
-
