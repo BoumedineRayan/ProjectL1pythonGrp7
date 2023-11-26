@@ -187,6 +187,8 @@ def tfidf(directory):
         for word in unique_words:
             doc_counts[word] += 1
 
+
+    # Step 2 : Calculate the idf by using the previous IDF_count() function
     idf_scores = idf_count(directory)
 
     # Step 3: Calculate term frequencies (TF) for each word in each document.
@@ -219,8 +221,57 @@ def tfidf(directory):
 
 
 
-print(tfidf("Cleaned"))
+
+def least_important_words(tfidf_matrix):
+    # Implement code to display the list of least important words
+    unimportant_words = [word for word, scores in tfidf_matrix.items() if all(score == 0 for score in scores)]
+    return unimportant_words
+
+def highest_tfidf_words(tfidf_matrix):
+    # Implement code to display the word(s) with the highest TF-IDF score
+    highest_tfidf_words = max(tfidf_matrix, key=lambda word: max(tfidf_matrix[word]))
+    return highest_tfidf_words
+
+def most_repeated_words_by_president(tfidf_matrix, president_name):
+    # Implement code to indicate the most repeated word(s) by a specific president
+    president_words = {word: max(scores) for word, scores in tfidf_matrix.items() if president_name.lower() in word.lower()}
+    most_repeated_words = max(president_words, key=president_words.get)
+    return most_repeated_words
+
+def president_speaking_of_nation(tfidf_matrix):
+    # Implement code to indicate the name(s) of the president(s) who spoke of the "Nation"
+    nation_mentions = {president: max(scores) for president, scores in tfidf_matrix.items() if "nation" in president.lower()}
+    most_mentions_president = max(nation_mentions, key=nation_mentions.get)
+    most_mentions_value = nation_mentions[most_mentions_president]
+    return most_mentions_president, most_mentions_value
+
+def first_president_to_talk_about(tfidf_matrix, keyword):
+    # Implement code to identify the first president to talk about a specific keyword
+    for president, scores in tfidf_matrix.items():
+        if any(score > 0 for score in scores) and keyword.lower() in president.lower():
+            return president
+    return None
+
+def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
+    # Implement code to identify words mentioned by all presidents (excluding unimportant words)
+    all_presidents_words = set(tfidf_matrix.keys())
+    for word in unimportant_words:
+        all_presidents_words.discard(word)
+    return list(all_presidents_words)
+
+
+def main():
+    speeches_directory = "speeches"
+    cleaned_directory = "cleaned"
 
 
 
+    print("1. List of Least Important Words:", least_important_words(tfidf("Cleaned")))
+    print("2. Word(s) with the Highest TF-IDF Score:", highest_tfidf_words(tfidf("Cleaned")))
+    print("3. Most Repeated Word(s) by President Chirac:", most_repeated_words_by_president(tfidf("Cleaned"), "Chirac"))
+    print("4. President(s) Speaking of 'Nation':", president_speaking_of_nation(tfidf("Cleaned")))
+    print("5. First President to Talk About 'Climate' or 'Ecology':", first_president_to_talk_about(tfidf("Cleaned"),"climat" or "ecologie" ))
+    print("6. Words Mentioned by All Presidents (excluding unimportant words):", words_mentioned_by_all_presidents(tfidf("Cleaned"), least_important_words(tfidf("Cleaned"))))
 
+if __name__ == "__main__":
+    main()
