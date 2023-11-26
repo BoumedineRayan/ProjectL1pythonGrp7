@@ -349,14 +349,13 @@ def menu():
         print(f"President Speaking Most about 'Nation': {president_max_freq}")
 
     elif choice == "9":
-        topic = input("Enter the topic (e.g., 'Climat' or 'ecologie'): ")
+        topic = input("Enter the topic (for this question it should be climat or ecologie)9: ")
         first_mention = first_president_to_mention_topic("Cleaned", topic)
         print(f"First President to Mention {topic}: {first_mention}")
 
-    elif choice == "10":
-        unimportant_words = least_important_words(tfidf("Cleaned"))
-        all_presidents_words = words_mentioned_by_all_presidents(tfidf("Cleaned"), unimportant_words)
-        print("Words Mentioned by All Presidents:", all_presidents_words)
+    elif choice == "9":
+        first_president = first_president_to_talk_about_climate_ecology("Cleaned")
+        print(f"First President to Talk about Climate or Ecology: {first_president}")
 
     else:
         print("Invalid choice. Please enter a number between 1 and 10.")
