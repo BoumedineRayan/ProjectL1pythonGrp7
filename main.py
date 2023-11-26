@@ -3,6 +3,7 @@ import os
 import string
 import math
 from collections import defaultdict
+import re
 
 
 def extract(file):  # Definition of the extract function
@@ -40,7 +41,7 @@ def FstName(name):
     return president_names.get(name)
 
 # Example usage: calling the function with the last name "Chirac"
-result = FstName("Chirac")
+
 
 # Displaying the result
 #print(result)
@@ -220,37 +221,71 @@ def tfidf(directory):
     return tfidf_matrix
 
 
-print(tfidf("Cleaned"))
+
 
 def least_important_words(tfidf_matrix):
     # Implement code to display the list of least important words
     unimportant_words = [word for word, scores in tfidf_matrix.items() if all(score == 0 for score in scores)]
     return unimportant_words
 
-def highest_tfidf_words(tfidf_matrix):
-    # Implement code to display the word(s) with the highest TF-IDF score
-    highest_tfidf_words = max(tfidf_matrix, key=lambda word: max(tfidf_matrix[word]))
+def highest_tfidf_words_sum(directory):
+    tfidf_matrix = tfidf(directory)
+    # Calculate the sum of TF-IDF scores for each word across all documents
+    word_sum_tfidf = {word: sum(tfidf_vector) for word, tfidf_vector in tfidf_matrix.items()}
+    # Find the word(s) with the highest sum of TF-IDF scores
+    highest_tfidf_words = max(word_sum_tfidf, key=word_sum_tfidf.get)
     return highest_tfidf_words
 
-def most_repeated_words_by_president(tfidf_matrix, president_name):
-    # Implement code to indicate the most repeated word(s) by a specific president
-    president_words = {word: max(scores) for word, scores in tfidf_matrix.items() if president_name.lower() in word.lower()}
-    most_repeated_words = max(president_words, key=president_words.get)
-    return most_repeated_words
+def repeat_word(directory, president_name):
+    tf_president = {}
+    for file in os.listdir(directory):
+        if president_name not in str(file): continue
+        with open(f"{directory}/{file}", 'r', encoding='utf-8') as file:
+            tf_dict = calculate_tf(file.read())
+            for word, tf in tf_dict.items():
+                if word not in tf_president:
+                    tf_president[word] = 0
+                tf_president[word] = tf_president[word] + tf
 
-def president_speaking_of_nation(tfidf_matrix):
-    # Implement code to indicate the name(s) of the president(s) who spoke of the "Nation"
-    nation_mentions = {president: max(scores) for president, scores in tfidf_matrix.items() if "nation" in president.lower()}
-    most_mentions_president = max(nation_mentions, key=nation_mentions.get)
-    most_mentions_value = nation_mentions[most_mentions_president]
-    return most_mentions_president, most_mentions_value
+    most_repeated_word = max(tf_president, key=tf_president.get)
+    return most_repeated_word
 
-def first_president_to_talk_about(tfidf_matrix, keyword):
-    # Implement code to identify the first president to talk about a specific keyword
-    for president, scores in tfidf_matrix.items():
-        if any(score > 0 for score in scores) and keyword.lower() in president.lower():
-            return president
-    return None
+
+def presidents_speaking_nation(directory):
+    freq_nation = {}
+    max_freq = 0
+    president_max = ""
+
+    for file in os.listdir(directory):
+        with open(f"{directory}/{file}", 'r', encoding='utf-8') as file_content:
+            content = file_content.read()
+            count = content.count("nation")
+            if count > 0:
+                president = re.match(r"Nomination_([a-zA-Z\s]+)(\d*)\.txt", file).group(1)
+                freq_nation[president] = freq_nation.get(president, 0) + count
+                if freq_nation[president] > max_freq:
+                    max_freq = freq_nation[president]
+                    president_max = president
+
+    return president_max
+
+
+def first_president_to_mention_topic(directory, topic):
+    first_mention = None
+
+    for file in os.listdir(directory):
+        with open(os.path.join(directory, file), 'r', encoding='utf-8') as file_content:
+            content = file_content.read()
+
+            # Check if the topic is mentioned in the content
+            if topic.lower() in content.lower():
+                president = re.match(r"Nomination_([a-zA-Z\s]+)(\d*)\.txt", file).group(1)
+
+                # Update the first_mention only if it's not set yet
+                if first_mention is None:
+                    first_mention = president
+
+    return first_mention
 
 def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
     # Implement code to identify words mentioned by all presidents (excluding unimportant words)
@@ -259,16 +294,7 @@ def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
         all_presidents_words.discard(word)
     return list(all_presidents_words)
 
+print(words_mentioned_by_all_presidents(tfidf("Cleaned"), least_important_words(tfidf("Cleaned"))))
 
-def main(
 
-):
-    speeches_directory = "speeches"
-    cleaned_directory = "cleaned"
 
-print("1. List of Least Important Words:", least_important_words(tfidf("Cleaned")))
-print("2. Word(s) with the Highest TF-IDF Score:", highest_tfidf_words(tfidf("Cleaned")))
-print("3. Most Repeated Word(s) by President Chirac:", most_repeated_words_by_president(tfidf("Cleaned"), "Chirac"))
-print("4. President(s) Speaking of 'Nation':", president_speaking_of_nation(tfidf("Cleaned")))
-print("5. First President to Talk About 'Climate' or 'Ecology':", first_president_to_talk_about(tfidf("Cleaned"), "climat/écologie"))
-print("6. Words Mentioned by All Presidents (excluding unimportant words):", words_mentioned_by_all_presidents(tfidf("Cleaned"), least_important_words(tfidf("Cleaned"))))
