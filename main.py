@@ -6,8 +6,11 @@ from collections import defaultdict
 import re
 
 
+################### Part 1 : Basic functions #####################
 def extract(file):  # Definition of the extract function
-    with open(file, "r",encoding='utf-8') as f:  # Opens the file in read mode
+    filepath = os.path.join("speeches", file)
+    with open(filepath, "r") as f:  # Opens the file in read mode
+
         d = {
             "Nomination_Chirac1.txt": "Chirac",
             "Nomination_Chirac2.txt": "Chirac",
@@ -19,10 +22,11 @@ def extract(file):  # Definition of the extract function
             "Nomination_Sarkozy.txt": "Sarkozy",
         }
 
-        return d.get(f.name)  # Returns the value associated with the key corresponding to the file name
+        return d.get(file)  # Returns the value associated with the key corresponding to the file name
 
 # Calling the extract function with the file "Nomination_Mitterrand2.txt"
 # print(extract("Nomination_Mitterrand2.txt"))
+
 
 
 def FstName(name):
@@ -122,7 +126,7 @@ def remove_punctuation(directory):
 
 remove_punctuation("Cleaned")
 
-
+################### Part 2 : TF, IDF, TF-IDF #####################
 def calculate_tf(s):
     # Split the string into words
     words = s.split()
@@ -221,7 +225,7 @@ def tfidf(directory):
     return tfidf_matrix
 
 
-
+################### Part 3 : Features to be developed  #####################
 
 def least_important_words(tfidf_matrix):
     # Implement code to display the list of least important words
@@ -295,5 +299,67 @@ def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
     return list(all_presidents_words)
 
 
+def menu():
+    print("Hello and welcome to the python project of Rayan Boumedine and Léo Carrouge ! ")
 
+    print("1. Extract President's First Name")
+    print("2. List of President's Last Names")
+    print("3. Clean and Remove Punctuation from Speeches")
+    print("4. Calculate TF-IDF Matrix")
+    print("5. List of Least Important Words")
+    print("6. Word with Highest TF-IDF Sum")
+    print("7. Most Repeated Word by President")
+    print("8. President Speaking about 'Nation'")
+    print("9. First President to Mention a Topic")
+    print("10. Words Mentioned by All Presidents")
+
+    choice = input("Enter the number of the function you want to execute: ")
+
+    if choice == "1":
+        file_name = str(input("enter a name of file ( for exemple : Nomination_Hollande.txt ) :"))
+        result = extract(file_name)
+        print("President's First Name:", FstName(result))
+
+    elif choice == "2":
+        print("List of President's Last Names:", LofNames(president_names))
+
+    elif choice == "3":
+        FCleaner()
+        print("Speeches cleaned and punctuation removed.")
+
+    elif choice == "4":
+        tfidf_matrix = tfidf("Cleaned")
+        print("TF-IDF Matrix:", tfidf_matrix)
+
+    elif choice == "5":
+        unimportant_words = least_important_words(tfidf("Cleaned"))
+        print("List of Least Important Words:", unimportant_words)
+
+    elif choice == "6":
+        highest_tfidf_word = highest_tfidf_words_sum("Cleaned")
+        print("Word with Highest TF-IDF Sum:", highest_tfidf_word)
+
+    elif choice == "7":
+        president_name = input("Enter the President's last name (e.g., 'Chirac'): ")
+        most_repeated_word = repeat_word("Cleaned", president_name)
+        print(f"Most Repeated Word by {president_name}:", most_repeated_word)
+
+    elif choice == "8":
+        president_max_freq = presidents_speaking_nation("Cleaned")
+        print(f"President Speaking Most about 'Nation': {president_max_freq}")
+
+    elif choice == "9":
+        topic = input("Enter the topic (e.g., 'Climat' or 'ecologie'): ")
+        first_mention = first_president_to_mention_topic("Cleaned", topic)
+        print(f"First President to Mention {topic}: {first_mention}")
+
+    elif choice == "10":
+        unimportant_words = least_important_words(tfidf("Cleaned"))
+        all_presidents_words = words_mentioned_by_all_presidents(tfidf("Cleaned"), unimportant_words)
+        print("Words Mentioned by All Presidents:", all_presidents_words)
+
+    else:
+        print("Invalid choice. Please enter a number between 1 and 10.")
+
+menu()
 
