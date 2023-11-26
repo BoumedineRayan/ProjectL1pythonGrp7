@@ -144,7 +144,7 @@ def Tf(s):
 
 
 
-def idf_score(directory):
+def idf_count(directory):
     files = os.listdir(directory)  # List all the files in the directory
     num_docs = len(files)  # Count the total number of documents (files)
 
@@ -162,7 +162,7 @@ def idf_score(directory):
 
     for word, count in doc_counts.items():
         if count != 0:
-            idf_scores[word] = math.log10(num_docs / count)  # Calculate the IDF score for the current word and store it in the idf_scores dictionary
+            idf_scores[word] = round(math.log10((num_docs / count)) + 1 ,5)# Calculate the IDF score for the current word and store it in the idf_scores dictionary
         else:
             idf_scores[word] = float('inf')  # Handle the case where count is zero (word appears in all documents)
 
@@ -170,33 +170,56 @@ def idf_score(directory):
 
 
 
+def tfidf(directory):
+    files = os.listdir(directory)
+    num_docs = len(files)
 
-def tfidf(directory_path):
-    # Get the list of file paths in the specified directory
-    file_paths = [os.path.join(directory_path, file) for file in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, file))]
+    doc_counts = defaultdict(int)
+    idf_scores = defaultdict(float)
 
-    # Read the content of each file
-    documents = []
-    for file_path in file_paths:
-        with open(file_path, 'r') as file:
-            content = file.read()
-            documents.append(content)
+    # Step 1: Calculate document frequencies for each word.
+    for file in files:
+        with open(os.path.join(directory, file), 'r') as f:
+            content = f.read()
+            words = content.split()
 
-    # Use Tf and idf_score functions to calculate TF-IDF matrix
-    tfidf_values = []
-    idf_scores = idf_score(directory_path)
-    for document in documents:
-        tf_values = Tf(document)
-        tfidf_values.append({word: tf * idf_scores[word] for word, tf in tf_values.items()})
+        unique_words = set(words)
+        for word in unique_words:
+            doc_counts[word] += 1
 
-    # Convert the TF-IDF matrix to a list of dictionaries for better readability
-    return tfidf_values
+    idf_scores = idf_count(directory)
+
+    # Step 3: Calculate term frequencies (TF) for each word in each document.
+    word_counts = {}
+    for file in files:
+        with open(os.path.join(directory, file), 'r') as f:
+            content = f.read()
+            words = content.split()
+
+        unique_words = set(words)
+        word_count = {}
+        for word in unique_words:
+            count = words.count(word)
+            word_count[word] = count
+        word_counts[file] = word_count
+
+    # Step 4: Calculate the TF-IDF scores for each word in each document.
+    tfidf_matrix = {}
+    unique_words = set(word for file in files for word in word_counts[file].keys())
+    for word in unique_words:
+        tfidf_matrix[word] = []
+        for file in files:
+            tf = 0
+            if word in word_counts[file]:
+                tf = word_counts[file][word]
+            idf = idf_scores[word]
+            tfidf_matrix[word].append(tf * idf)
+
+    return tfidf_matrix
+
+
 
 print(tfidf("Cleaned"))
-
-
-
-
 
 
 
