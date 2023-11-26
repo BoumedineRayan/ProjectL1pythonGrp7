@@ -28,17 +28,21 @@ This project focuses on text analysis, using the TF-IDF. Our project is divided 
 **Part 3: Making of a menu for the user to use**
 
 Menu options: 
-- Display least important words in the corpus (`Type 1`):
+- Extract President's First Name (`Type 1`)
+- List of President's Last Names (`Type 2`)
+- Clean and remove punctuation from speeches (`Type 3`)
+- Display the TF-IDF matrix (`Type 4`)
+- Display least important words in the corpus (`Type 5`):
     - Shows words with TF-IDF = 0 in all files.
-- Display word(s) with the highest TF-IDF score (`Type 2`):
+- Display word(s) with the highest TF-IDF score (`Type 6`):
     - Shows word(s) with the highest TF-IDF scores.
-- Indicate most repeated word(s) by President Chirac (`Type 3`):
+- Indicate most repeated word(s) by President Chirac (`Type 7`):
     - Shows the most repeated word(s) in speeches by President Chirac.
-- Indicate president(s) who spoke of 'Nation' and the one who repeated it the most (`Type 4`):
+- Indicate president(s) who spoke of 'Nation' and the one who repeated it the most (`Type 8`):
     - Identifies the president(s) mentioning 'Nation' and the one with the most repeated mentions.
-- Identify the first president to talk about 'climate' or 'ecology' (`Type 5`):
+- Identify the first president to talk about 'climate' or 'ecology' (`Type 9`):
     - Determines the first president to discuss 'climate' or 'ecology.'
-- Show words mentioned by all presidents (except unimportant words) (`Type 6`):
+- Show words mentioned by all presidents (except unimportant words) (`Type 10`):
     - Displays words mentioned by all presidents, excluding unimportant words.
 - Exit the program (`Type 0`)
     - Exits the program.
