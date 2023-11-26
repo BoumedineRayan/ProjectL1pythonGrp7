@@ -296,4 +296,39 @@ def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
 
 
 
+def menu():
+    print("Hello and welcome in the project of Leo Carouge and Rayan Boumedine !" + '\n' +
+                          "here we have different choices to go through our project :"+'\n'+
+                          "Type 1 if you want to go to the basics functions :  " + '\n'+
+                          "Type 2 if you want to go to the TF, IDF, TF-IDF Functions :  "+ '\n'+
+                          "Type 3 if you want to leave the project ")
+    answer = int(input("Your answer : "))
+    if answer == 1:
+        print("which function do you want to execute ?"+ '\n' +
+              "Type 1 if you want to execute the extract(file) function :  " + '\n' +
+              "Type 2 if you want to execute the FstName(name) function :  " + '\n' +
+              "Type 3 if you want to execute the LofNames(dic) function :  " + '\n' +
+              "Type 4 if you want to execute the remove_punctuation(directory) function :  " + '\n' +
+              "Type 5 if you want to execute the FCleaner() function :  " + '\n' +
+              "Type 6 if you want to leave the project :  ")
+        choice=int(input())
+        if choice==1:
+            print(extract()) 
+        elif choice==2:
+            print()
+        elif choice==3:
+            print()
+        elif choice==4:
+            print() 
+        elif choice==5:
+            print() 
+        elif choice==6:
+            print()
 
+    if answer == 2:
+        print("which function do you want to execute ?" + '\n' +
+              "Type 1 if you want to execute the calculate_tf(s)) function :  " + '\n' +
+              "Type 2 if you want to execute the idf_count(directory) function :  " + '\n' +
+              "Type 3 if you want to execute the LofNames(dic) function :  " + '\n' +
+              "Type 4 if you want to leave the project :  ")
+        choice=int(input())
