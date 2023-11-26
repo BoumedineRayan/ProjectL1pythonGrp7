@@ -6,7 +6,7 @@ from collections import defaultdict
 
 
 def extract(file):  # Definition of the extract function
-    with open(file, "r") as f:  # Opens the file in read mode
+    with open(file, "r",encoding='utf-8') as f:  # Opens the file in read mode
         d = {
             "Nomination_Chirac1.txt": "Chirac",
             "Nomination_Chirac2.txt": "Chirac",
@@ -86,11 +86,11 @@ def FCleaner():
         outputpath = os.path.join(cleaned_dir, filename)  # constructs the o,
         # which is the path where the cleaned file will be saved
 
-        with open(inputpath, "r") as inputfile:
+        with open(inputpath, "r", encoding='utf-8') as inputfile:
             contentofthefile = inputfile.read().lower()  # convert to lower case and store in a variable
 
 
-        with open(outputpath, "w") as outputfile:
+        with open(outputpath, "w",encoding='utf-8') as outputfile:
             outputfile.write(contentofthefile)  # write the converted text into a new document
             # in the Cleaned directory
 FCleaner()
@@ -100,7 +100,7 @@ FCleaner()
 def remove_punctuation(directory):
     for filename in os.listdir(directory):
         filepath = os.path.join(directory, filename)
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r',encoding='utf-8') as f:
             text = f.read()
 
         # replace apostrophe with space
@@ -115,14 +115,14 @@ def remove_punctuation(directory):
         # remove punctuation characters
         text = text.translate(str.maketrans('', '', string.punctuation))
 
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w',encoding='utf-8') as f:
             f.write(text)
 
 
 remove_punctuation("Cleaned")
 
 
-def Tf(s):
+def calculate_tf(s):
     # Split the string into words
     words = s.split()
 
@@ -152,7 +152,7 @@ def idf_count(directory):
     idf_scores = defaultdict(float)  # Create a dictionary to store the IDF scores for each word
 
     for file in files:
-        with open(os.path.join(directory, file), 'r') as f:
+        with open(os.path.join(directory, file), 'r',encoding='utf-8') as f:
             content = f.read()  # Read the content of the file
             words = content.split()  # Split the content into individual words
 
@@ -220,7 +220,7 @@ def tfidf(directory):
     return tfidf_matrix
 
 
-
+print(tfidf("Cleaned"))
 
 def least_important_words(tfidf_matrix):
     # Implement code to display the list of least important words
@@ -260,18 +260,15 @@ def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
     return list(all_presidents_words)
 
 
-def main():
+def main(
+
+):
     speeches_directory = "speeches"
     cleaned_directory = "cleaned"
 
-
-
-    print("1. List of Least Important Words:", least_important_words(tfidf("Cleaned")))
-    print("2. Word(s) with the Highest TF-IDF Score:", highest_tfidf_words(tfidf("Cleaned")))
-    print("3. Most Repeated Word(s) by President Chirac:", most_repeated_words_by_president(tfidf("Cleaned"), "Chirac"))
-    print("4. President(s) Speaking of 'Nation':", president_speaking_of_nation(tfidf("Cleaned")))
-    print("5. First President to Talk About 'Climate' or 'Ecology':", first_president_to_talk_about(tfidf("Cleaned"),"climat" or "ecologie" ))
-    print("6. Words Mentioned by All Presidents (excluding unimportant words):", words_mentioned_by_all_presidents(tfidf("Cleaned"), least_important_words(tfidf("Cleaned"))))
-
-if __name__ == "__main__":
-    main()
+print("1. List of Least Important Words:", least_important_words(tfidf("Cleaned")))
+print("2. Word(s) with the Highest TF-IDF Score:", highest_tfidf_words(tfidf("Cleaned")))
+print("3. Most Repeated Word(s) by President Chirac:", most_repeated_words_by_president(tfidf("Cleaned"), "Chirac"))
+print("4. President(s) Speaking of 'Nation':", president_speaking_of_nation(tfidf("Cleaned")))
+print("5. First President to Talk About 'Climate' or 'Ecology':", first_president_to_talk_about(tfidf("Cleaned"), "climat/écologie"))
+print("6. Words Mentioned by All Presidents (excluding unimportant words):", words_mentioned_by_all_presidents(tfidf("Cleaned"), least_important_words(tfidf("Cleaned"))))
