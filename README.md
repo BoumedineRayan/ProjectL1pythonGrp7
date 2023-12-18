@@ -1,4 +1,4 @@
-# Python project Part.1
+# Python project
 
 ## Team members
 - **Rayan BOUMEDINE**
