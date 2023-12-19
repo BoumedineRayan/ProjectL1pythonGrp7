@@ -7,7 +7,7 @@ import re
 
 
 ################### Part 1 : Basic functions #####################
-def extract(file):  # Definition of the extract function
+def Extract_the_names_of_the_presidents(file):  # Definition of the extract function
     filepath = os.path.join("speeches", file)
     with open(filepath, "r") as f:  # Opens the file in read mode
 
@@ -167,12 +167,11 @@ def idf_count(directory):
 
     for word, count in doc_counts.items():
         if count != 0:
-            idf_scores[word] = round(math.log10((num_docs / count)) + 1 ,5)# Calculate the IDF score for the current word and store it in the idf_scores dictionary
+            idf_scores[word] = round(math.log10((num_docs / count)) ,5)# Calculate the IDF score for the current word and store it in the idf_scores dictionary
         else:
             idf_scores[word] = float('inf')  # Handle the case where count is zero (word appears in all documents)
 
     return idf_scores  # Return the IDF scores for all the words in the directory
-
 
 
 def tfidf(directory):
@@ -184,7 +183,7 @@ def tfidf(directory):
 
     # Step 1: Calculate document frequencies for each word.
     for file in files:
-        with open(os.path.join(directory, file), 'r') as f:
+        with open(os.path.join(directory, file), 'r',encoding='utf-8') as f:
             content = f.read()
             words = content.split()
 
@@ -227,10 +226,16 @@ def tfidf(directory):
 
 ################### Part 3 : Features to be developed  #####################
 
+
+
+
 def least_important_words(tfidf_matrix):
     # Implement code to display the list of least important words
     unimportant_words = [word for word, scores in tfidf_matrix.items() if all(score == 0 for score in scores)]
     return unimportant_words
+
+
+
 
 def highest_tfidf_words_sum(directory):
     tfidf_matrix = tfidf(directory)
@@ -239,6 +244,9 @@ def highest_tfidf_words_sum(directory):
     # Find the word(s) with the highest sum of TF-IDF scores
     highest_tfidf_words = max(word_sum_tfidf, key=word_sum_tfidf.get)
     return highest_tfidf_words
+
+
+
 
 def repeat_word(directory, president_name):
     tf_president = {}
@@ -253,6 +261,8 @@ def repeat_word(directory, president_name):
 
     most_repeated_word = max(tf_president, key=tf_president.get)
     return most_repeated_word
+
+
 
 
 def presidents_speaking_nation(directory):
@@ -274,6 +284,9 @@ def presidents_speaking_nation(directory):
     return president_max
 
 
+
+
+
 def first_president_to_mention_topic(directory, topic):
     first_mention = None
 
@@ -291,73 +304,250 @@ def first_president_to_mention_topic(directory, topic):
 
     return first_mention
 
-def words_mentioned_by_all_presidents(tfidf_matrix, unimportant_words):
-    # Implement code to identify words mentioned by all presidents (excluding unimportant words)
-    all_presidents_words = set(tfidf_matrix.keys())
-    for word in unimportant_words:
-        all_presidents_words.discard(word)
-    return list(all_presidents_words)
+
+
+
+def words_mentioned_by_all_presidents(tf_idf_matrix):
+    all_presidents_words = set(tf_idf_matrix.keys())
+    unimportant_words = {word for word, scores in tf_idf_matrix.items() if all(score == 0 for score in scores)}
+    important_words = all_presidents_words - unimportant_words
+    print("Words Mentioned by All Presidents (excluding 'unimportant' words):", list(important_words))
+
+
+
+
+
+
+
+def extract_words_from_question(question_text):
+    # Split the input text into words
+    words = question_text.split()
+    return words
+
+
+def identify_corpus_terms(matrix,txt):
+    keys_utf8 = []
+    answer = []
+    for key,values in matrix.items():
+        keys_utf8.append(key)
+
+    txt = extract_words_from_question(txt)
+    for element in txt:
+        if element in keys_utf8:
+            answer.append(element)
+    return answer
+
+def TF_question(question):
+    word_counts = {}
+    question_tokens = question.split()
+    for element in question_tokens:
+        n = word_counts.get(element, 0)
+        word_counts[element] = n + 1
+    return word_counts
+
+
+def calculate_tfidf_of_question(tf, idf_scores):
+    tfidf_vector = {word: tf[word] * idf_scores.get(word, 0) for word in tf}
+    return list(tfidf_vector.values())
+
+# Implement the remaining functions for Part 2
+
+# Function 18a: Scalar product (dot function)
+def dot_product(vector1, vector2):
+    return sum(x * y for x, y in zip(vector1, vector2))
+
+# Function 18b: Norm of a vector
+def vector_norm(vector):
+    return math.sqrt(sum(x**2 for x in vector))
+
+# Function 18c: Calculating similarity
+def calculate_similarity(vector1, vector2):
+    dot = dot_product(vector1, vector2)
+    norm_vector1 = vector_norm(vector1)
+    norm_vector2 = vector_norm(vector2)
+
+    if (norm_vector1 * norm_vector2) == 0:
+        return 0
+
+    similarity = dot / (norm_vector1 * norm_vector2)
+    return similarity
+
+# Function 19: Finding the most relevant document
+def find_most_relevant_document(tfidf_matrix, question_vector, file_names):
+    max_similarity = -1
+    most_relevant_document = None
+
+    for doc_vector, file_name in zip(tfidf_matrix.values(), file_names):
+        similarity = calculate_similarity(question_vector, doc_vector)
+        if similarity > max_similarity:
+            max_similarity = similarity
+            most_relevant_document = file_name
+
+    return most_relevant_document
+
+def find_highest_tfidf_word(tfidf_vector, document, question):
+    filepath = os.path.join("speeches", document)
+    words = question.split()  # You missed the parentheses here
+
+    # Create a dictionary with words from the question and their corresponding TF-IDF values
+    tfidf_vectorz = {words[i]: tfidf_vector[i] for i in range(len(words))}  # Use len(words) to get the correct range
+
+    # Sort the dictionary by TF-IDF values in descending order
+    sorted_tfidf = sorted(tfidf_vectorz.items(), key=lambda item: item[1], reverse=True)
+
+    with open(filepath.replace("speeches", "cleaned"), 'r', encoding='utf-8') as file:
+        document_content = file.read().split()
+
+    for word, _ in sorted_tfidf:
+        if word in document_content:
+            return word
+
+    return None
+
+
+
+
+def extract_passage_with_word(document, word):
+    filepath = os.path.join("speeches", document)
+    with open(filepath, 'r', encoding='utf-8') as file:
+        text = file.read()
+        sentences = text.split(".")
+        for i, sentence in enumerate(sentences):
+            if word.lower() in [w.strip().lower() for w in sentence.split()]:
+                start_index = max(0, i - 1)
+                end_index = min(len(sentences), i + 2)
+                passage = ".".join(sentences[start_index:end_index]).strip()
+                return passage + '.'
+    return None
+
+def detect_question_starter(question):
+    question_starters = {
+        "Comment": "Après analyse, ",
+        "Pourquoi": "Car, ",
+        "Peux-tu": "Oui, bien sûr!",
+        "Quand": "À ce moment-là, ",
+        "Où": "Là où, ",
+        "Est-ce que": "En effet, ",
+        "Quoi": "En ce qui concerne cela, ",
+        "Qui": "Quant à la personne en question, ",
+        "Combien": "Le nombre est de, ",
+        "Pour": "Dans le but de, "
+    }
+    words = question.split()
+
+    for word in words:
+        if word in question_starters:
+            return question_starters.get(word)
+    return "Comme le dit"
+
 
 
 def menu():
-    print("Hello and welcome to the python project of Rayan Boumedine and Léo Carrouge ! ")
+    print("######  Hello and welcome to the python project of Rayan Boumedine and Léo Carrouge !  #########")
 
-    print("1. Extract President's First Name")
-    print("2. List of President's Last Names")
-    print("3. Clean and Remove Punctuation from Speeches")
-    print("4. Calculate TF-IDF Matrix")
-    print("5. List of Least Important Words")
-    print("6. Word with Highest TF-IDF Sum")
-    print("7. Most Repeated Word by President")
-    print("8. President Speaking about 'Nation'")
-    print("9. First President to Mention a Topic")
-    print("10. Words Mentioned by All Presidents")
 
-    choice = input("Enter the number of the function you want to execute: ")
+    print("###################1. Take a Look at our function ##############################################")
+    print("###################2. Ask question to our chatbot ############################################# ")
 
-    if choice == "1":
-        file_name = str(input("enter a name of file ( for exemple : Nomination_Hollande.txt ) :"))
-        result = extract(file_name)
-        print("President's First Name:", FstName(result))
+    choice1= int(input("Enter a number of the function you want to execute: "))
 
-    elif choice == "2":
-        print("List of President's Last Names:", LofNames(president_names))
+    if choice1 == 1:
 
-    elif choice == "3":
-        FCleaner()
-        print("Speeches cleaned and punctuation removed.")
+        print("1. Extract President's First Name")
+        print("2. List of President's Last Names")
+        print("3. Clean and Remove Punctuation from Speeches")
+        print("4. Calculate TF-IDF Matrix")
+        print("5. List of Least Important Words")
+        print("6. Word with Highest TF-IDF Sum")
+        print("7. Most Repeated Word by President")
+        print("8. President Speaking about 'Nation'")
+        print("9. First President to Mention a Topic")
+        print("10. Words Mentioned by All Presidents")
 
-    elif choice == "4":
-        tfidf_matrix = tfidf("Cleaned")
-        print("TF-IDF Matrix:", tfidf_matrix)
+        choice = input("Enter the number of the function you want to execute: ")
 
-    elif choice == "5":
-        unimportant_words = least_important_words(tfidf("Cleaned"))
-        print("List of Least Important Words:", unimportant_words)
+        if choice == "1":
+            file_name = str(input("enter a name of file ( for exemple : Nomination_Hollande.txt ) :"))
+            result = Extract_the_names_of_the_presidents(file_name)
+            print("President's First Name:", FstName(result))
 
-    elif choice == "6":
-        highest_tfidf_word = highest_tfidf_words_sum("Cleaned")
-        print("Word with Highest TF-IDF Sum:", highest_tfidf_word)
+        elif choice == "2":
+            print("List of President's Last Names:", LofNames(president_names))
 
-    elif choice == "7":
-        president_name = input("Enter the President's last name (e.g., 'Chirac'): ")
-        most_repeated_word = repeat_word("Cleaned", president_name)
-        print(f"Most Repeated Word by {president_name}:", most_repeated_word)
+        elif choice == "3":
+            FCleaner()
+            print("Speeches cleaned and punctuation removed.")
 
-    elif choice == "8":
-        president_max_freq = presidents_speaking_nation("Cleaned")
-        print(f"President Speaking Most about 'Nation': {president_max_freq}")
+        elif choice == "4":
+            tfidf_matrix = tfidf("Cleaned")
+            print("TF-IDF Matrix:", tfidf_matrix)
 
-    elif choice == "9":
-        topic = input("Enter the topic (for this question it should be climat or ecologie)9: ")
-        first_mention = first_president_to_mention_topic("Cleaned", topic)
-        print(f"First President to Mention {topic}: {first_mention}")
+        elif choice == "5":
+            unimportant_words = least_important_words(tfidf("Cleaned"))
+            print("List of Least Important Words:", unimportant_words)
 
-    elif choice == "9":
-        first_president = first_president_to_talk_about_climate_ecology("Cleaned")
-        print(f"First President to Talk about Climate or Ecology: {first_president}")
+        elif choice == "6":
+            highest_tfidf_word = highest_tfidf_words_sum("Cleaned")
+            print("Word with Highest TF-IDF Sum:", highest_tfidf_word)
 
-    else:
-        print("Invalid choice. Please enter a number between 1 and 10.")
+        elif choice == "7":
+            president_name = input("Enter the President's last name (e.g., 'Chirac'): ")
+            most_repeated_word = repeat_word("Cleaned", president_name)
+            print(f"Most Repeated Word by {president_name}:", most_repeated_word)
+
+        elif choice == "8":
+            president_max_freq = presidents_speaking_nation("Cleaned")
+            print(f"President Speaking Most about 'Nation': {president_max_freq}")
+
+        elif choice == "9":
+            topic = input("Enter the topic (for this question it should be climat or ecologie)9: ")
+            first_mention = first_president_to_mention_topic("Cleaned", topic)
+            print(f"First President to Mention {topic}: {first_mention}")
+        elif choice == "10":
+            print(words_mentioned_by_all_presidents(tfidf("Cleaned")))
+
+        else:
+            print("Invalid choice. Please enter a number between 1 and 10.")
+
+    if choice1 == 2:
+        while True:
+
+            filesname = [
+            "Nomination_Chirac1.txt",
+            "Nomination_Chirac2.txt",
+            "Nomination_Giscard dEstaing.txt",
+            "Nomination_Hollande.txt",
+            "Nomination_Macron.txt",
+            "Nomination_Mitterrand1.txt",
+            "Nomination_Mitterrand2.txt",
+            "Nomination_Sarkozy.txt",
+        ]
+
+
+            question = str(input("##################### Ask a question to Our Chatbot :                       "))
+            if AttributeError:
+                print("Veillez saisir quelque chose dans le thème des discours des présidents !")
+            fctA = extract_words_from_question(question)
+            fctB = identify_corpus_terms(tfidf("Cleaned"),question)
+            tf = TF_question(question)
+            tfidf_question = calculate_tfidf_of_question(tf,idf_count("Cleaned"))
+            document = find_most_relevant_document(tfidf("Cleaned"),tfidf_question,filesname)
+            highest = find_highest_tfidf_word(tfidf_question,document,question)
+            final_answer = detect_question_starter(question) +", "+ "comme le dit "+Extract_the_names_of_the_presidents(document)+", " +extract_passage_with_word(document,highest)
+            print(final_answer)
+            redo = int(input("Type 1 if you wanna send him another question or type 0 if you want to leave : "))
+            if redo == 0:
+                print("Thank you for using us !")
+                break
+            else:
+                True
+
+
+
+
+
 
 menu()
+
+
+
