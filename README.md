@@ -28,7 +28,7 @@ This project focuses on text analysis, using the TF-IDF. Our project is divided 
 **Part 3: Making of a menu for the user to use**
 
 Menu options: 
--Type 1 to see our functions and then:
+- Type 1 to see our functions and then:
     - Extract President's First Name (`Type 1`)
     - List of President's Last Names (`Type 2`)
     - Clean and remove punctuation from speeches (`Type 3`)
@@ -47,7 +47,7 @@ Menu options:
         - Displays words mentioned by all presidents, excluding unimportant words.
     - Exit the program (`Type 0`)
         - Exits the program.
--Type 2 to ask a question
+- Type 2 to ask a question
 
 
 
