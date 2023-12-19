@@ -525,7 +525,7 @@ def menu():
 
 
             question = str(input("##################### Ask a question to Our Chatbot :                       "))
-            if AttributeError:
+            if AttributeError == True:
                 print("Veillez saisir quelque chose dans le thème des discours des présidents !")
             fctA = extract_words_from_question(question)
             fctB = identify_corpus_terms(tfidf("Cleaned"),question)
