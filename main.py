@@ -387,7 +387,7 @@ def find_most_relevant_document(tfidf_matrix, question_vector, file_names):
 
 def find_highest_tfidf_word(tfidf_vector, document, question):
     filepath = os.path.join("speeches", document)
-    words = question.split()  # You missed the parentheses here
+    words = question.split() 
 
     # Create a dictionary with words from the question and their corresponding TF-IDF values
     tfidf_vectorz = {words[i]: tfidf_vector[i] for i in range(len(words))}  # Use len(words) to get the correct range
@@ -443,7 +443,7 @@ def detect_question_starter(question):
 
 
 def menu():
-    print("######  Hello and welcome to the python project of Rayan Boumedine and Léo Carrouge !  #########")
+    print("######  Hello and welcome to the python project of Rayan Boumedine and Léo Carouge !  #########")
 
 
     print("###################1. Take a Look at our function ##############################################")
